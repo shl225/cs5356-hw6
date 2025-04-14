@@ -17,12 +17,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     console.log("POST request to:", req.url)
-
-    if (req.url.includes('logout')) {
-      await auth.signOut(req)  
-      return NextResponse.json({ message: 'Logged out successfully' })
-    }
-
     return await postHandler(req)
   } catch (error) {
     console.error("POST Error:", error)
