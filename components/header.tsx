@@ -8,11 +8,9 @@ import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 
 export function Header() {
-    // Use React Query to fetch and cache session data
     const { data: session, refetch } = useQuery({
         queryKey: ["session"],
         queryFn: () => {
-            // Create Headers object from document.cookie
             const headers = new Headers()
             headers.append('Cookie', document.cookie)
             
@@ -24,16 +22,19 @@ export function Header() {
                 }
             })
         },
-        // Fallback to null if no session
         placeholderData: null
     })
 
-    // Refetch session data when component mounts
     useEffect(() => {
         refetch()
     }, [refetch])
 
-    // Debug session data
+    const handleLogout = async () => {
+        await fetch('/api/auth/logout', { method: 'POST' });
+                document.cookie = 'session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        refetch();
+    }
+
     console.log("Current session:", session)
 
     return (
@@ -50,7 +51,7 @@ export function Header() {
                         {session?.user?.role === 'admin' && <AdminNavEntry />}
                     </nav>
                 </div>
-                <UserButton />
+                <UserButton onSignOut={handleLogout} />
             </div>
         </header>
     )
