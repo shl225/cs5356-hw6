@@ -18,25 +18,27 @@ export async function POST(req: NextRequest) {
   try {
     console.log("POST request to:", req.url)
 
+    // Handle the sign-out request by first using the BetterAuth handler
+    // then ensuring cookies are cleared
     if (req.url.includes("sign-out")) {
-      const cookies = req.cookies.getAll()
-      const response = new NextResponse(JSON.stringify({ success: true }), { 
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      response.headers.append("Set-Cookie", `session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
-      response.headers.append("Set-Cookie", `better_auth_session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
-      
-      cookies.forEach(cookie => {
-        if (cookie.name.includes('session') || cookie.name.includes('auth')) {
-          response.headers.append("Set-Cookie", `${cookie.name}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
-        }
-      });
-      
-      return response;
+      try {
+        // Let BetterAuth handle initial sign-out process
+        const authResponse = await postHandler(req);
+        
+        // Now ensure all cookies are properly cleared
+        const response = new NextResponse(JSON.stringify({ success: true }), { 
+          status: 200,
+          headers: authResponse.headers
+        });
+        
+        // Add cookie clearing headers
+        response.headers.append("Set-Cookie", `session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
+        
+        return response;
+      } catch (error) {
+        console.error("Sign-out error:", error);
+        return NextResponse.json({ error: "Failed to sign out" }, { status: 500 });
+      }
     }
 
     return await postHandler(req)
