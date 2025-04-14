@@ -1,34 +1,27 @@
 "use client"
-
 import Link from "next/link"
 import { UserButton } from "@daveyplate/better-auth-ui"
 import { Button } from "./ui/button"
 import { AdminNavEntry } from "./AdminNavEntry"
-import { authClient } from "@/lib/auth-client"
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 
-type Session = {
-  user?: {
-    role?: string
-    id?: string
-  } | null
-} | null
-
 export function Header() {
-    //react query hook to fetch session data
-    const { data: session, refetch } = useQuery<Session>({
+    const { data: session, refetch } = useQuery({
         queryKey: ["session"],
-        queryFn: () => authClient.getSession(),
-        select: (data) => data ?? null
+        queryFn: async () => {
+            const headersInstance = headers()
+            return await auth.api.getSession({ headers: headersInstance })
+        },
+        placeholderData: null
     })
 
-    //refetch session data when component mounts
     useEffect(() => {
         refetch()
     }, [refetch])
 
-    //debug session data
     console.log("Current session:", session)
 
     return (
