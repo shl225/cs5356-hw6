@@ -59,11 +59,9 @@ export function Providers({ children }: { children: ReactNode }) {
                     authClient={authClient}
                     navigate={router.push}
                     replace={router.replace}
-                    onSessionChange={(session) => {
+                    onSessionChange={() => {
+                        // Force refresh when session changes
                         router.refresh()
-                        if (!session) {
-                            router.push('/')
-                        }
                     }}
                     LinkComponent={Link}
                 >
