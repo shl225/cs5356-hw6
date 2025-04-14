@@ -6,11 +6,23 @@ import { todos } from "@/database/schema"
 import { Button } from "@/components/ui/button"
 import { deleteTodo } from "@/actions/todos"
 
+import { auth } from "@/lib/auth"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+
 export const dynamic = 'force-dynamic'
 
 export default async function AdminPage() {
     
     /* YOUR AUTHORIZATION CHECK HERE */
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    //redirecting if not authenticated or not admin
+    if (!session || session.user.role !== 'admin') {
+        redirect('/');
+    }
 
     const allTodos = await db.query.todos.findMany({
         with: {
