@@ -85,7 +85,8 @@ export async function deleteTodo(formData: FormData) {
 
     //checking if user is admin
     if (!session || session.user.role !== 'admin') {
-        return { error: "Unauthorized: Only admins can delete todos" };
+        console.error("Unauthorized: Only admins can delete todos");
+        return;
     }
 
     const id = formData.get("id") as string;
@@ -93,9 +94,8 @@ export async function deleteTodo(formData: FormData) {
     try {
         await db.delete(todos).where(eq(todos.id, id));
         revalidatePath("/admin");
-        return { success: true };
     } catch (error) {
-        return { error: "Failed to delete todo" };
+        console.error("Failed to delete todo", error);
     }
 
     // const id = formData.get("id") as string;
