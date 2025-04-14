@@ -18,12 +18,23 @@ export async function POST(req: NextRequest) {
   try {
     console.log("POST request to:", req.url)
 
-    // Handle the sign-out request manually by clearing cookies
     if (req.url.includes("sign-out")) {
-      const response = new NextResponse("Logged out successfully", { status: 200 });
-
-      // Clear the session cookie by setting its max-age to 0
-      response.headers.set("Set-Cookie", "session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax");
+      const cookies = req.cookies.getAll()
+      const response = new NextResponse(JSON.stringify({ success: true }), { 
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      response.headers.append("Set-Cookie", `session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
+      response.headers.append("Set-Cookie", `better_auth_session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
+      
+      cookies.forEach(cookie => {
+        if (cookie.name.includes('session') || cookie.name.includes('auth')) {
+          response.headers.append("Set-Cookie", `${cookie.name}=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
+        }
+      });
       
       return response;
     }
