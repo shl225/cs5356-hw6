@@ -1,37 +1,31 @@
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "@/database/db";
-import * as schema from "@/database/schema";
-import { nextCookies } from "better-auth/next-js";
-import { admin } from "better-auth/plugins";
+import { betterAuth } from "better-auth"
+import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { admin } from "better-auth/plugins"
 
-// Use a fallback in case BETTER_AUTH_URL is not defined
-const betterAuthUrl = process.env.BETTER_AUTH_URL ?? "http://localhost:3000"; // Default fallback URL
+import { db } from "@/database/db"
+import * as schema from "@/database/schema"
+import { nextCookies } from "better-auth/next-js"
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg",
         usePlural: true,
-        schema,
+        schema
     }),
     session: {
         cookieCache: {
             enabled: true,
-            maxAge: 5 * 60, // Session expiration
-        },
+            // Cache duration in seconds.
+            // set to 5 mins for development; 
+            // could be a week or longer in production
+            maxAge: 5 * 60 
+        }
     },
     emailAndPassword: {
-        enabled: true,    },
-    plugins: [
-        nextCookies(), // Keep this last in plugins array
-        admin(), // Adding the admin role plugin
-    ],
-    routes: {
-        api: {
-            prefix: "/api/auth",
-            signUp: "/sign-up/email",
-            signIn: "/sign-in/email",
-            getSession: "/get-session",
-        },
+        enabled: true
     },
-});
+    plugins: [
+        nextCookies(),
+        admin()
+    ]
+})
