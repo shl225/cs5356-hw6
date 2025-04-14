@@ -4,7 +4,8 @@ import Link from "next/link"
 import { UserButton } from "@daveyplate/better-auth-ui"
 import { Button } from "./ui/button"
 import { AdminNavEntry } from "./AdminNavEntry"
-import { useSession } from "@/lib/hooks" 
+import { useSession } from "@/lib/hooks"  
+import { useState, useEffect } from "react"  
 import { isAdmin } from "@/lib/role-check"  
 
 export function Header() {
