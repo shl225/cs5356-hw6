@@ -1,31 +1,40 @@
 "use client"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
 import { Todo } from "@/database/schema"
-
 import { TodoItem } from "./TodoItem"
-
 import { useActionState } from "react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { createTodo } from "@/actions/todos"
 
 export function TodoList({ todos }: { todos: Todo[] }) {
-
     const [state, formAction] = useActionState(async (prevState: any, formData: FormData) => {
-        const result = await createTodo(formData)
-
-        if (result.error) {
-            toast.error(result.error)
-            return result
+        try {
+            await createTodo(formData)
+            
+            const inputElement = document.querySelector('input[name="title"]') as HTMLInputElement
+            if (inputElement) inputElement.value = ""
+            
+            toast.success("Todo created successfully")
+            
+            return { success: true }
+        } catch (error) {
+            if (error instanceof Error) {
+                const errorMessage = error.message
+                toast.error(errorMessage)
+                
+                return {
+                    error: errorMessage,
+                    fieldErrors: errorMessage.includes("title") 
+                        ? { title: [errorMessage] } 
+                        : undefined
+                }
+            }
+            
+            toast.error("An unexpected error occurred")
+            return { error: "An unexpected error occurred" }
         }
-        //clearing input field
-        const inputElement = document.querySelector('input[name="title"]') as HTMLInputElement
-        if (inputElement) inputElement.value = ""
-
-        return result
     }, null)
 
     return (
@@ -52,4 +61,4 @@ export function TodoList({ todos }: { todos: Todo[] }) {
             </ul>
         </div>
     )
-} 
+}
