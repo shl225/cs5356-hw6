@@ -18,16 +18,14 @@ export async function POST(req: NextRequest) {
   try {
     console.log("POST request to:", req.url)
 
-    // Check if the request is for the sign-out route
+    // Handle the sign-out request manually by clearing cookies
     if (req.url.includes("sign-out")) {
-      await auth.signOut(req); // Sign out the user
-      // Explicitly clear the cookies for session removal
       const response = new NextResponse("Logged out successfully", { status: 200 });
-      
-      // Clear the session cookie
+
+      // Clear the session cookie by setting its max-age to 0
       response.headers.set("Set-Cookie", "session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax");
       
-      return response; // Return the response after signing out
+      return response;
     }
     
     return await postHandler(req)
