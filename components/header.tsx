@@ -4,26 +4,18 @@ import Link from "next/link"
 import { UserButton } from "@daveyplate/better-auth-ui"
 import { Button } from "./ui/button"
 import { AdminNavEntry } from "./AdminNavEntry"
-import { authClient } from "@/lib/auth-client"
-import { useQuery } from "@tanstack/react-query"
-import { useEffect } from "react"
+import { useSession } from "@/lib/hooks" 
+import { isAdmin } from "@/lib/role-check"  
 
 export function Header() {
-    //react query hook to fetch session data
-    const { data: session, refetch } = useQuery({
-        queryKey: ["session"],
-        queryFn: () => authClient.getSession(),
-    })
+    const { session } = useSession();
+    const [isUserAdmin, setIsUserAdmin] = useState(false);
 
-    //refetch session data when component mounts
     useEffect(() => {
-        refetch()
-    }, [refetch])
-
-    //debug session data
-    console.log("Current session:", session)
-
-    const isAdmin = session && "user" in session && session.user?.role === 'admin';
+        if (session?.user) {
+            isAdmin(session.user.id).then(setIsUserAdmin);
+        }
+    }, [session]);
 
     return (
         <header className="sticky top-0 z-50 px-4 py-3 border-b bg-background/60 backdrop-blur">
@@ -36,11 +28,11 @@ export function Header() {
                         <Link href="/todos">
                             <Button variant="ghost">Todos</Button>
                         </Link>
-                        {isAdmin && <AdminNavEntry />}
+                        {isUserAdmin && <AdminNavEntry />}
                     </nav>
                 </div>
                 <UserButton />
             </div>
         </header>
-    )
+    );
 }
