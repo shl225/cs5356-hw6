@@ -23,6 +23,8 @@ export function Header() {
     //debug session data
     console.log("Current session:", session)
 
+    const isAdmin = session && "user" in session && session.user?.role === 'admin';
+
     return (
         <header className="sticky top-0 z-50 px-4 py-3 border-b bg-background/60 backdrop-blur">
             <div className="container mx-auto flex items-center justify-between">
@@ -34,7 +36,7 @@ export function Header() {
                         <Link href="/todos">
                             <Button variant="ghost">Todos</Button>
                         </Link>
-                        {session?.user?.role === 'admin' && <AdminNavEntry />}
+                        {isAdmin && <AdminNavEntry />}
                     </nav>
                 </div>
                 <UserButton />
