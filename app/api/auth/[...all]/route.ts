@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       return response;
     }
     
+    // Proceed with the default handler for sign-in
     return await postHandler(req)
   } catch (error) {
     console.error("POST Error:", error)
