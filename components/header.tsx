@@ -4,24 +4,24 @@ import { UserButton } from "@daveyplate/better-auth-ui"
 import { Button } from "./ui/button"
 import { AdminNavEntry } from "./AdminNavEntry"
 import { auth } from "@/lib/auth"
-import { headers } from "next/headers"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 
 export function Header() {
+    // Use React Query to fetch and cache session data
     const { data: session, refetch } = useQuery({
         queryKey: ["session"],
-        queryFn: async () => {
-            const headersInstance = headers()
-            return await auth.api.getSession({ headers: headersInstance })
-        },
+        queryFn: () => auth.api.getSession(),
+        // Fallback to null if no session
         placeholderData: null
     })
 
+    // Refetch session data when component mounts
     useEffect(() => {
         refetch()
     }, [refetch])
 
+    // Debug session data
     console.log("Current session:", session)
 
     return (
