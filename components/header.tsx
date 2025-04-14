@@ -11,7 +11,7 @@ export function Header() {
     // Use React Query to fetch and cache session data
     const { data: session, refetch } = useQuery({
         queryKey: ["session"],
-        queryFn: () => auth.api.getSession(),
+        queryFn: () => auth.api.getSession({}),
         // Fallback to null if no session
         placeholderData: null
     })
