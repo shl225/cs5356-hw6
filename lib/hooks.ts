@@ -4,19 +4,17 @@ import { useState, useEffect } from "react"
 import { auth } from "./auth"
 
 export function useSession() {
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<any>(null); 
 
   useEffect(() => {
     let ignore = false;
 
     async function fetchSession() {
-      // Create a Headers object if needed
-      const headers = new Headers();
-      // You can optionally add headers if needed:
-      // headers.append('Cookie', document.cookie);
-
-      const session = await auth.api.getSession({ headers });
-
+      const session = await auth.api.getSession({
+        headers: new Headers({
+          "Content-Type": "application/json",
+        }),
+      });
       if (!ignore) {
         setSession(session);
       }
@@ -28,5 +26,5 @@ export function useSession() {
     };
   }, []);
 
-  return { session };
+  return { session, setSession }; 
 }
