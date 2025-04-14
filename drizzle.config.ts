@@ -12,5 +12,5 @@ export default defineConfig({
   out: './database/migrations',
   schema: './database/schema/*',
   dialect: 'postgresql',
-  dbCredentials: { url },
+  dbCredentials: { url, ssl: false },
 });

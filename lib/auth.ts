@@ -5,6 +5,8 @@ import { db } from "@/database/db"
 import * as schema from "@/database/schema"
 import { nextCookies } from "better-auth/next-js"
 
+import { admin } from "better-auth/plugins"
+
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg",
@@ -21,9 +23,19 @@ export const auth = betterAuth({
         }
     },
     emailAndPassword: {
-        enabled: true
+        enabled: true,
+        allowedOrigins: process.env.BETTER_AUTH_URL.split(',').map(origin => origin.trim())
     },
     plugins: [
-        nextCookies() // keep this last in `plugins` array
-    ]
+        nextCookies(), // keep this last in `plugins` array
+        admin() //adding admin role
+    ],
+    routes: {
+        api: {
+            prefix: "/api/auth",
+            signUp: "/sign-up/email",
+            signIn: "/sign-in/email",
+            getSession: "/get-session"
+        }
+    }
 })

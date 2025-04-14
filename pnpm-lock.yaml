@@ -125,7 +125,7 @@ importers:
         specifier: ^16.4.7
         version: 16.4.7
       drizzle-kit:
-        specifier: ^0.30.5
+        specifier: ^0.30.6
         version: 0.30.6
       esbuild:
         specifier: ^0.25.1
