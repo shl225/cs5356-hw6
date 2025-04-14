@@ -5,13 +5,23 @@ import { NextRequest, NextResponse } from "next/server"
 const { POST: postHandler, GET: getHandler } = toNextJsHandler(auth)
 
 // Helper to add CORS headers to all responses
-function addCorsHeaders(response: NextResponse, req: NextRequest) {
+function addCorsHeaders(response: Response, req: NextRequest) {
   const origin = req.headers.get('origin') || 'https://cs5356-hw6-git-main-shl225s-projects.vercel.app';
-  response.headers.set('Access-Control-Allow-Origin', origin);
-  response.headers.set('Access-Control-Allow-Credentials', 'true');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  return response;
+  
+  // Create a new response with the same body, status and headers
+  const newResponse = new NextResponse(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+  
+  // Add CORS headers
+  newResponse.headers.set('Access-Control-Allow-Origin', origin);
+  newResponse.headers.set('Access-Control-Allow-Credentials', 'true');
+  newResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  newResponse.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  return newResponse;
 }
 
 export async function GET(req: NextRequest) {
@@ -36,16 +46,13 @@ export async function POST(req: NextRequest) {
         // Let BetterAuth handle initial sign-out process
         const authResponse = await postHandler(req);
         
-        // Now ensure all cookies are properly cleared
-        const response = new NextResponse(JSON.stringify({ success: true }), { 
-          status: 200,
-          headers: authResponse.headers
-        });
+        // Convert to NextResponse and add cookie clearing
+        const response = addCorsHeaders(authResponse, req);
         
-        // Add cookie clearing headers
+        // Add cookie clearing header
         response.headers.set("Set-Cookie", `session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax`);
         
-        return addCorsHeaders(response, req);
+        return response;
       } catch (error) {
         console.error("Sign-out error:", error);
         const errorResponse = NextResponse.json({ error: "Failed to sign out" }, { status: 500 });
@@ -66,7 +73,7 @@ export async function POST(req: NextRequest) {
 export async function OPTIONS(req: NextRequest) {
   const origin = req.headers.get('origin') || 'https://cs5356-hw6-git-main-shl225s-projects.vercel.app';
   
-  const response = new NextResponse(null, {
+  return new NextResponse(null, {
     status: 200,
     headers: {
       'Access-Control-Allow-Origin': origin,
@@ -75,6 +82,4 @@ export async function OPTIONS(req: NextRequest) {
       'Access-Control-Allow-Credentials': 'true'
     }
   });
-  
-  return response;
 }
