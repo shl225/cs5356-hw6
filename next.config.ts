@@ -2,14 +2,14 @@ import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
     experimental: {
-        nodeMiddleware: true,  // Keep this enabled to use node middleware
+        nodeMiddleware: true,  
     },
     async headers() {
         return [
             {
-                source: '/api/auth/(.*)',  // This should work better for matching all routes under /api/auth/
+                source: '/api/auth/(.*)',  
                 headers: [
-                    { key: 'Access-Control-Allow-Origin', value: '*' },
+                    { key: 'Access-Control-Allow-Origin', value: 'https://cs5356-hw6-git-main-shl225s-projects.vercel.app' },
                     { key: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
                     { key: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization' },
                     { key: 'Access-Control-Allow-Credentials', value: 'true' },
@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
         return [
             {
                 source: '/todos',
-                destination: '/api/todos',  // Adjust this to match your actual endpoint
+                destination: '/api/todos',  
             },
         ]
     }
