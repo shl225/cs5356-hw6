@@ -3,9 +3,11 @@ import { adminClient } from "better-auth/client/plugins"
 
 export const authClient = createAuthClient({
     plugins: [
-        adminClient() 
+        adminClient() // adding admin role
     ],
-    onSignOut: async () => {
+    // Use BetterAuth's signOut callback
+    onSignOut: () => {
+        // Redirect to homepage after sign out
         window.location.href = "/"
     }
 })
