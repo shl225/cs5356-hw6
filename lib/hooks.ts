@@ -10,8 +10,13 @@ export function useSession() {
     let ignore = false;
 
     async function fetchSession() {
-      // Pass headers if needed
-      const session = await auth.api.getSession({ headers: {} });
+      // Create a Headers object if needed
+      const headers = new Headers();
+      // You can optionally add headers if needed:
+      // headers.append('Cookie', document.cookie);
+
+      const session = await auth.api.getSession({ headers });
+
       if (!ignore) {
         setSession(session);
       }
