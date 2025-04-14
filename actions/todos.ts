@@ -17,7 +17,7 @@ export async function createTodo(formData: FormData) {
     });
 
     if (!session) {
-        return { error: "Unauthorized" }
+        throw new Error("Unauthorized");
     }
 
     const title = formData.get("title") as string
@@ -28,13 +28,10 @@ export async function createTodo(formData: FormData) {
     })
 
     if (!validationResult.success) {
-        return { 
-            error: validationResult.error.errors[0].message,
-            fieldErrors: validationResult.error.flatten().fieldErrors 
-        }
+        throw new Error(validationResult.error.errors[0].message);
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     await db.insert(todos).values({
         title,
@@ -42,7 +39,6 @@ export async function createTodo(formData: FormData) {
     })
 
     revalidatePath("/todos")
-    return { success: true }
 }
 
 export async function toggleTodo(formData: FormData) {
@@ -52,18 +48,18 @@ export async function toggleTodo(formData: FormData) {
     });
 
     if (!session) {
-        return { error: "Unauthorized" }
+        throw new Error("Unauthorized");
     }
 
     const id = formData.get("id") as string
 
-    // Defensive programming: only allow toggling of user's own todos
+    //only allowing toggling of user's own todos
     const todo = await db.query.todos.findFirst({
         where: (todos, { eq }) => eq(todos.id, id) 
     })
 
     if (!todo || todo.userId !== session.user.id) {
-        return { error: "Unauthorized to toggle this todo" }
+        throw new Error("Unauthorized to toggle this todo");
     }
 
     await db.update(todos)
@@ -74,7 +70,6 @@ export async function toggleTodo(formData: FormData) {
         .where(eq(todos.id, id))
 
     revalidatePath("/todos")
-    return { success: true }
 }
 
 export async function deleteTodo(formData: FormData) {
