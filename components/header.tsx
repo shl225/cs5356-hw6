@@ -13,10 +13,27 @@ export function Header() {
     const [isUserAdmin, setIsUserAdmin] = useState(false);
 
     useEffect(() => {
-        if (session?.user) {
+        // If session is available, check if the user is an admin
+        if (session?.user?.id) {
             isAdmin(session.user.id).then(setIsUserAdmin);
         }
     }, [session]);
+
+    // Show nothing if no session or user is not admin
+    if (!session || !session.user) {
+        return (
+            <header className="sticky top-0 z-50 px-4 py-3 border-b bg-background/60 backdrop-blur">
+                <div className="container mx-auto flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link href="/" className="flex items-center gap-2">
+                            CS 5356 – HW 6
+                        </Link>
+                    </div>
+                    <UserButton />
+                </div>
+            </header>
+        );
+    }
 
     return (
         <header className="sticky top-0 z-50 px-4 py-3 border-b bg-background/60 backdrop-blur">
@@ -29,6 +46,7 @@ export function Header() {
                         <Link href="/todos">
                             <Button variant="ghost">Todos</Button>
                         </Link>
+                        {/* Show AdminNavEntry only if user is an admin */}
                         {isUserAdmin && <AdminNavEntry />}
                     </nav>
                 </div>
