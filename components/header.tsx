@@ -8,11 +8,19 @@ import { authClient } from "@/lib/auth-client"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 
+type Session = {
+  user?: {
+    role?: string
+    id?: string
+  } | null
+} | null
+
 export function Header() {
     //react query hook to fetch session data
-    const { data: session, refetch } = useQuery({
+    const { data: session, refetch } = useQuery<Session>({
         queryKey: ["session"],
         queryFn: () => authClient.getSession(),
+        select: (data) => data ?? null
     })
 
     //refetch session data when component mounts
