@@ -20,7 +20,7 @@ export default function Home() {
                         </code>
                         .
                     </li>
-                    <li>Save and see your changes instantly.1</li>
+                    <li>Save and see your changes instantly.</li>
                 </ol>
 
 
